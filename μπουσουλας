@@ -1,0 +1,38 @@
+models = extractModels(imageDir)  επιστρεφει μοντελα απο φακελο φωτογραφιων
+
+x  models = findNewModelsInImage(models, filename)		επιστρεφει ανανεωμενα τα μοντελα
+
+x  image = loadAndPrepareImage(filename)		διαβαζει και δημιουργει image structure
+x  image = passAllModels(image,models)			εφαρμιγη μοντελων και ανανεωση image
+x  [image, models] = findNewModels(image, models)
+
+x  errorMap = getErrorMap(image, model)
+x  image = updateClassifyMatrix(image, errorMap, modelID)
+x  roi = getROI(image)		κατα τα γνωστα
+x  model = trainNewModel(roi)
+models = updateIntraModelError(models)		κατασκευαζει/ανανεωνει πινακα model.errors
+
+x  modelHist = getModelHist(models, filemane)	δινουμε ολα μοντελα και αρχειο εικονας και παραγει ιστογραμμα μοντελων
+
+%structure image
+image.in
+image.out
+image.x
+image.y
+image.errorMap
+image.classID
+image.noClassified
+image.name
+image.class
+
+%structure roi
+roi.in    περιοχη εκπαιδευσης
+roi.out   -//-
+roi.centerX κεντρο περιοχης
+roi.centerY
+
+%structure model
+model.C
+model.trainIn==roi.in
+model.trainOut==roi.out
+model.errors σφαλμα μοντελου σε σχεση με trainIn και trainOut υπολοιπων μοντελων
