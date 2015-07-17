@@ -13,8 +13,7 @@ function models = extractModels(imageDir, className, models)
 	srcFiles = dir([imageDir className '/*.JPEG']);
 	filename = {};
 	% keeping last 5 images for testing
-	%nTrain = length(srcFiles) - 5;
-	nTrain = 10;
+	nTrain = 0.9*length(srcFiles);
 	for i=1:nTrain
 		filename{i} = [imageDir className '/' srcFiles(i).name];
 	end

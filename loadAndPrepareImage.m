@@ -48,7 +48,7 @@ function  image = loadAndPrepareImage(filename)
     image.fileName=filename;
     image.class=[];
     % end-4 cause it's 'JPEG', not jpg (stupid imageNET :p)
-    filenameXml = [filename(1:end-4) 'xml'];
+    filenameXml = [ filename(1:8) 'xml/' filename(16:(end-4)) 'xml' ];
     if(exist(filenameXml, 'file') == 2)
         box_xmin = getXMLvalue(filenameXml, 'xmin');
         box_xmax = getXMLvalue(filenameXml, 'xmax');

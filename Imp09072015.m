@@ -3,7 +3,7 @@ clc
 
 global parameters;
 parameters = struct();
-parameters.threshold = 0.001;
+parameters.threshold = 0.01;
 parameters.maskPreset = 12;
 % maskScanSize
 % if 0 : will be calculated at loadAndPrepareImage.m (ins*outs *1.5)

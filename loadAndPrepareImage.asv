@@ -1,0 +1,67 @@
+%% Function that reads image file and updates image structure
+
+function  image = loadAndPrepareImage(filename)
+
+    Image=imread(filename);
+    Image=double(Image)/255;
+
+    % set in TrainScript
+    global parameters;
+    mask=createMask(parameters.maskPreset);
+
+    if(parameters.maskScanSize == 0)
+        temp1 = sum(sum(mask==1));
+        temp2 = sum(sum(mask==2));
+        parameters.maskScanSize = ceil(1.5*temp1(1)*temp2(1));
+        disp(sprintf( 'Mask preset %d, scansize %d', parameters.maskPreset, parameters.maskScanSize ));
+    end
+
+    s=size(mask);
+    IN=[];
+    OUT=[];
+    k=1;
+    maxX = size(Image,1) - s(1);
+    maxY = size(Image,2) - s(2);
+    for j=1:maxY
+        for i=1:maxX
+            temp=Image(i:i+s(1)-1, j:j+s(2)-1,:);
+            in=temp(mask==1);
+            %bias
+            in=[in;1];
+            IN = [IN in];
+            out=temp(mask==2);
+            OUT = [OUT out];
+            x(k)=i;
+            y(k)=j;
+            k=k+1;
+        end
+    end
+
+    image.Im=Image;
+    image.in=IN;
+    image.out=OUT;
+    image.x=x;
+    image.y=y;
+    image.errorMap=inf(maxX,maxY);
+    image.classID=zeros(maxX,maxY);
+    image.noClassified=true(maxX,maxY);
+    image.fileName=filename;
+    image.class=[];
+    % end-4 cause it's 'JPEG', not jpg (stupid imageNET :p)
+    filenameXml = [filename(1:end-4) 'xml'];
+    name = fileparts(filename);
+    if(exist(filenameXml, 'file') == 2)
+        box_xmin = getXMLvalue(filenameXml, 'xmin');
+        box_xmax = getXMLvalue(filenameXml, 'xmax');
+        box_ymin = getXMLvalue(filenameXml, 'ymin');
+        box_ymax = getXMLvalue(filenameXml, 'ymax');
+        % NOTE: xmin,xmax: to crop or whatever in matlab
+        % imageCropped = imageOriginal(ymin:ymax, xmin:max)
+        % reverse order!
+        image.boundingBox = [box_ymin box_ymax box_xmin box_xmax] ;
+        % example: cropping image
+        % imageCropped = Image(box_ymin:box_ymax, box_xmin:box_xmax, :);
+        % OR
+        % imageCropped = Image( image.boundingBox(1):image.boundingBox(2), image.boundingBox(3):image.boundingBox(4))
+    end
+end
